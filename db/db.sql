@@ -7,7 +7,42 @@ CREATE TABLE roles(
     created_at TIMESTAMP(0) NOT NULL,
     updated_at TIMESTAMP(0) NOT NULL
 );
-
+INSERT INTO roles(
+        name,
+        route,
+        created_at,
+        updated_at
+    )
+VALUES (
+   'CLIENTE',
+   'client/products/list',
+   '2022-07-09',
+   '2022-07-09'
+);
+INSERT INTO roles(
+        name,
+        route,
+        created_at,
+        updated_at
+    )
+VALUES (
+   'RESTAURANTE',
+   'restaurant/orders/list',
+   '2022-07-09',
+   '2022-07-09'
+);
+INSERT INTO roles(
+        name,
+        route,
+        created_at,
+        updated_at
+    )
+VALUES (
+   'REPARTIDOR',
+   'delivery/orders/list',
+   '2022-07-09',
+   '2022-07-09'
+);
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users(
     id BIGSERIAL PRIMARY KEY,
@@ -22,7 +57,6 @@ CREATE TABLE users(
     created_at TIMESTAMP(0) NOT NULL,
     updated_at TIMESTAMP(0) NOT NULL
 );
-
 DROP TABLE IF EXISTS user_has_roles CASCADE;
 CREATE TABLE user_has_roles(
     id_user BIGSERIAL NOT NULL,
