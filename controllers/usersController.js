@@ -2,6 +2,7 @@ const User = require('../models/user');
 const Rol = require('../models/rol');
 const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
+const storage = require('../utils/cloud_storage');
 
 module.exports = {
     async getAll(req, res, next) {
@@ -41,6 +42,40 @@ module.exports = {
         }
     },
 
+    async registerWithImage(req, res, next) {
+        try {
+            const user = JSON.parse(req.body.user);
+            console.log(`Datos enviados del usuario: ${user}`);
+            const files = req.files;
+
+            if (files.length > 0) {
+                const pathImage = `image_${Date.now()}`; // NOMBRE DEL ARCHIVO QUE SE VA A ALMACENAR
+                const url = await storage(files[0], pathImage);
+
+                if (url != undefined && url != null) {
+                    user.image = url;
+                }
+            }
+
+            const data = await User.create(user);
+
+            await Rol.create(data.id, 1); // ROL POR DEFECTO (CLIENTE)
+
+            return res.status(201).json({
+                success: true,
+                message: 'El registro se realizó correctamente, ahora inicia sesión',
+                data: data.id
+            })
+        } catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Hubo un error con el registro del usuario',
+                error: error,
+            })
+        }
+    },
+
 
     async login(req, res, next) {
         try {
@@ -57,7 +92,7 @@ module.exports = {
             }
 
             if (User.isPasswordMached(password, myUser.password)) {
-                const token = jwt.sign({id: myUser.id, email: myUser.email}, keys.secretOrKey, {
+                const token = jwt.sign({ id: myUser.id, email: myUser.email }, keys.secretOrKey, {
                     // expiresIn: (60*60*24) // 1 HORA
                 });
                 const data = {
